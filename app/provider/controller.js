@@ -122,6 +122,8 @@ angular.module('streamium.provider.controller', ['ngRoute'])
   $scope.message = '';
   $scope.messages = [];
 
+  window.addEventListener('beforeunload', dontClose);
+
   StreamiumProvider.on('broadcast:start', function(peer) {
     console.log('Start broadcast for ' + peer);
     $scope.peers[peer] = peer;
@@ -198,6 +200,8 @@ angular.module('streamium.provider.controller', ['ngRoute'])
 })
 
 .controller('CashoutStreamCtrl', function(StreamiumProvider, $location, Duration, $scope, bitcore) {
+
+  window.removeEventListener('beforeclose', dontClose);
   $scope.client = StreamiumProvider;
   $scope.totalMoney = 0;
   $scope.clients = [];
@@ -297,3 +301,13 @@ function retrievePendingTxs(Insight) {
     });
   });
 }
+
+var dontClose = function (e) {
+  var e = e || window.event;
+  var question = 'This will end the broadcast';
+
+  if (e) {
+    e.returnValue = question;
+  }
+  return question;
+};
